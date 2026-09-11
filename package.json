@@ -19,7 +19,9 @@
   "packageManager": "pnpm@12.3.4",
   "type": "module",
   "dependencies": {
+    "bcrypt": "^6.0.0",
     "express": "^5.2.1",
-    "mongoose": "^9.9.5"
+    "mongoose": "^9.9.5",
+    "zod": "^4.6.1"
   }
 }
