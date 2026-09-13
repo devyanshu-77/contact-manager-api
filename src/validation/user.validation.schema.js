@@ -25,5 +25,26 @@ const signupSchema = z.object({
       },
     ),
 });
+const signinSchema = z.object({
+  email: z
+    .email({ message: "Invalid email format" })
+    .min(3, { message: "Email is too short" })
+    .max(254, { message: "Email is too long" }),
+  password: z
+    .string()
+    .min(8, { message: "Password must contain atleast 8 characters" })
+    .max(24, { message: "Password must not exceed 24 characters" })
+    .refine(
+      (val) => {
+        const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).+$/;
+        const res = regex.test(val);
+        return res;
+      },
+      {
+        message:
+          "Password must contain a number, uppercase, lowercase and a special character",
+      },
+    ),
+})
 
-export { signupSchema };
+export { signupSchema , signinSchema };
