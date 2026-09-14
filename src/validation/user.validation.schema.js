@@ -45,6 +45,6 @@ const signinSchema = z.object({
           "Password must contain a number, uppercase, lowercase and a special character",
       },
     ),
-})
+});
 
-export { signupSchema , signinSchema };
+export { signupSchema, signinSchema };

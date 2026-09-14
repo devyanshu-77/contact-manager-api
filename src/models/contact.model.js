@@ -10,9 +10,9 @@ const contactSchema = new mongoose.Schema({
     type: String,
     unique: true,
   },
-  comapany: String,
+  company: String,
   job_title: String,
-  tage: String,
+  tag: String,
   userId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
