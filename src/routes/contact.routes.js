@@ -60,5 +60,26 @@ contactRouter.post("/contacts", auth, async (req, res) => {
     }
   }
 });
+contactRouter.get("/contacts", auth, async (req, res) => {
+  try {
+    const userId = req.userId;
+    const contacts = await Contact.find({ userId: userId });
+    if (0 === contacts.length) {
+      res
+        .status(404)
+        .json({ success: false, message: "You do not have any contact" });
+      return;
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Fetched all contacts",
+      contacts: [...contacts],
+    });
+  } catch (err) {
+    console.log("Fetch all contacts error: ", err);
+    res.status(500).json({ success: false, message: "Internl server error" });
+  }
+});
 
 export { contactRouter };
