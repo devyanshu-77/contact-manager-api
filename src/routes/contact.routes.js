@@ -5,6 +5,7 @@ import Contact from "../models/contact.model.js";
 import {
   createSchema,
   searchSchema,
+  updateSchema,
 } from "../validation/contact.validation.schema.js";
 import auth from "../middlewares/auth.js";
 
@@ -109,8 +110,42 @@ contactRouter.query("/contacts/search", auth, async (req, res) => {
       contact: contact,
     });
   } catch (err) {
-    console.log("Error: ", err);
+    console.log("Search contact error: ", err);
     res.status(500).json({ success: false, message: "Internal server error" });
   }
 });
+contactRouter.put("/contacts/:id", auth, async (req, res) => {
+  try {
+    const contactId = req.params.id;
+    const userId = req.userId;
+    const validationResult = updateSchema.safeParse(req.body);
+    if (!validationResult.success) {
+      const formattedErrors = validationResult.error.issues.map((err) => ({
+        path: err.path[0],
+        message: err.message,
+      }));
+      return res.status(422).json({
+        success: false,
+        message: "Input validation error",
+        error: formattedErrors,
+      });
+    }
+
+    const data = validationResult.data;
+    const updatedContact = await Contact.findOneAndUpdate(
+      { _id: contactId, userId: userId },
+      { $set: data },
+      { returnDocument: "after" },
+    );
+    res.status(200).json({
+      success: true,
+      message: "Updated contact successfuly",
+      updatedContact: updatedContact,
+    });
+  } catch (err) {
+    console.log("Update contact error: ", err);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+});
+
 export { contactRouter };
