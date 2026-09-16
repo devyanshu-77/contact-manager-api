@@ -2,7 +2,10 @@ import { Router } from "express";
 const contactRouter = Router();
 
 import Contact from "../models/contact.model.js";
-import { createSchema } from "../validation/contact.validation.schema.js";
+import {
+  createSchema,
+  searchSchema,
+} from "../validation/contact.validation.schema.js";
 import auth from "../middlewares/auth.js";
 
 contactRouter.post("/contacts", auth, async (req, res) => {
@@ -81,5 +84,33 @@ contactRouter.get("/contacts", auth, async (req, res) => {
     res.status(500).json({ success: false, message: "Internl server error" });
   }
 });
-
+contactRouter.query("/contacts/search", auth, async (req, res) => {
+  try {
+    const validationResult = searchSchema.safeParse(req.body);
+    if (!validationResult.success) {
+      const formattedErrors = validationResult.error.issues.map((e) => ({
+        path: e.path[0],
+        message: e.message,
+      }));
+      res.status(422).json({
+        success: false,
+        message: "Input validation error",
+        error: formattedErrors,
+      });
+      return;
+    }
+    const data = Object.entries(validationResult.data).map(([key, value]) => {
+      return { [key]: value };
+    });
+    const contact = await Contact.find({ $or: [...data] });
+    res.status(200).json({
+      success: true,
+      message: "Fetched related contacts",
+      contact: contact,
+    });
+  } catch (err) {
+    console.log("Error: ", err);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+});
 export { contactRouter };
