@@ -147,5 +147,28 @@ contactRouter.put("/contacts/:id", auth, async (req, res) => {
     res.status(500).json({ success: false, message: "Internal server error" });
   }
 });
+contactRouter.delete("/contacts/:id", auth, async (req, res) => {
+  try {
+    const contactId = req.params.id;
+    const userId = req.userId;
+    const deletedContact = await Contact.findOneAndDelete({
+      _id: contactId,
+      userId: userId,
+    });
+    if (!deletedContact) {
+      res
+        .status(404)
+        .json({ success: false, message: "Contact doesn't exist" });
+      return;
+    }
+    res.status(204).json({
+      success: true,
+      message: "Deleted contact successfuly",
+    });
+  } catch (err) {
+    console.log("Delete contact error ", err);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+});
 
 export { contactRouter };
